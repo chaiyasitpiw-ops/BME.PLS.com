@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paolo Samut Prakan-BME</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <section id="loginScreen" class="login-screen">
+    <form id="loginForm" class="login-card">
+      <div class="logo big">BME</div>
+      <h1>Paolo Samut Prakan-BME</h1>
+      <p>เข้าสู่ระบบก่อนใช้งานเอกสารสำคัญของโรงพยาบาล</p>
+      <div class="field">
+        <label for="loginUser">ผู้ใช้งาน</label>
+        <select id="loginUser"></select>
+      </div>
+      <div class="field">
+        <label for="loginPassword">รหัส PIN/Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="ใส่รหัส">
+        <p class="hint">รหัสเริ่มต้น: Admin BME = 9999, Supervisor CES (PLS) และหัวหน้าหน่วยเครื่องมือแพทย์ = 1234</p>
+      </div>
+      <button class="btn primary" type="submit">เข้าสู่ระบบ</button>
+    </form>
+  </section>
+
+  <div id="appShell" class="shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">BME</div>
+        <div>
+          <strong>Hospital Sign</strong>
+          <span>Paolo Samut Prakan-BME</span>
+        </div>
+      </div>
+      <div class="user-panel">
+        <strong id="userName">-</strong>
+        <span id="userRole">-</span>
+      </div>
+      <nav>
+        <button class="nav active" data-view="admin">📁 Admin/BME</button>
+        <button class="nav" data-view="inbox">✍️ งานที่ต้องเซ็น</button>
+        <button class="nav" data-view="track">📍 ติดตามเอกสาร</button>
+        <button class="nav" data-view="audit">📜 Audit Log</button>
+        <button class="nav" data-view="settings">⚙️ ตั้งค่าระบบ</button>
+      </nav>
+      <div class="side-card">
+        <strong>หัวหน้าใช้งานอย่างไร</strong>
+        <p>เปิดลิงก์ระบบ เลือกชื่อ ใส่ PIN แล้วเข้าเมนู "งานที่ต้องเซ็น" ระบบจะแสดงเฉพาะเอกสารที่ถึงคิวของคนนั้น</p>
+      </div>
+      <button class="btn logout" id="logoutBtn">ออกจากระบบ</button>
+    </aside>
+
+    <main>
+      <header class="top">
+        <div>
+          <h1>Paolo Samut Prakan-BME</h1>
+          <p id="roleLine">กำลังโหลดข้อมูล...</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn" id="refreshBtn">🔄 รีเฟรช</button>
+          <button class="btn primary" data-go="admin">➕ สร้างเอกสาร</button>
+        </div>
+      </header>
+
+      <section id="mobileLinkBox" class="mobile-link-box">
+        <div>
+          <strong>ลิงก์มือถือ/iPad ปัจจุบัน</strong>
+          <span id="mobileLinkText">กำลังโหลด...</span>
+          <small id="serverStatusText">กำลังตรวจสถานะเซิร์ฟเวอร์...</small>
+        </div>
+        <div class="actions">
+          <a class="btn blue" id="mobileLinkOpen" href="#" target="_blank" rel="noopener">เปิดลิงก์</a>
+          <button class="btn" id="mobileLinkCopy" type="button">คัดลอก</button>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div><span>เอกสารที่เห็นได้</span><strong id="statTotal">0</strong></div>
+        <div><span>รอฉันเซ็น</span><strong id="statMine">0</strong></div>
+        <div><span>กำลังดำเนินการ</span><strong id="statProgress">0</strong></div>
+        <div><span>ครบแล้ว</span><strong id="statDone">0</strong></div>
+      </section>
+      <section id="kpiPanel" class="kpi-grid"></section>
+
+      <section id="adminView" class="view">
+        <div class="layout">
+          <div class="panel">
+            <h2>Admin/BME สร้างเอกสาร</h2>
+            <form id="createForm">
+              <input id="rrNo" type="hidden">
+              <input id="title" type="hidden" required>
+              <div class="auto-title-box">
+                <strong>ชื่อเอกสารจะอ้างอิงจากไฟล์ Excel ช่องแรกอัตโนมัติ</strong>
+                <span id="autoTitleText">เลือกไฟล์ Excel แล้วระบบจะตั้งชื่อใบงานให้เอง</span>
+              </div>
+              <div class="two">
+                <div class="field">
+                  <label for="department">ส่งให้แผนก</label>
+                  <select id="department" required></select>
+                </div>
+                <div class="field">
+                  <label for="priority">ความเร่งด่วน</label>
+                  <select id="priority">
+                    <option>ปกติ</option>
+                    <option>ด่วน</option>
+                    <option>ด่วนมาก</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="workFile">1. ไฟล์ Excel ใบงาน/รายละเอียด</label>
+                <input id="workFile" type="file" accept=".xlsx,.xls,.xlsm" required>
+              </div>
+              <div class="field">
+                <label for="repairFile">2. ไฟล์หน้า N Smart งานซ่อม</label>
+                <input id="repairFile" type="file" accept=".html,.htm,.mhtml,.mht,text/html,message/rfc822" required>
+                <p class="hint">แนะนำให้บันทึกเป็น MHTML ถ้าทำได้ เพราะรวมรูปและหน้าตาไว้ในไฟล์เดียว หากใช้ HTML ให้แนบโฟลเดอร์ *_files เพิ่มด้านล่าง</p>
+              </div>
+              <div class="field">
+                <label for="repairAssets">2.1 รูป/ไฟล์ประกอบ HTML N Smart</label>
+                <input id="repairAssets" type="file" multiple accept="image/*,.css,.js">
+                <p class="hint">ถ้า N Smart สร้างโฟลเดอร์ *_files มาด้วย ให้เปิดโฟลเดอร์นั้นแล้วเลือกไฟล์รูปทั้งหมด เพื่อให้มือถือเห็นรูปครบ</p>
+              </div>
+              <div class="field">
+                <label for="quoteFile">3. ไฟล์ใบเสนอราคา</label>
+                <input id="quoteFile" type="file" required>
+              </div>
+              <div class="field">
+                <label for="photoFiles">4. แนบรูปอาการเสีย / Word / ไฟล์ประกอบ</label>
+                <input id="photoFiles" type="file" multiple>
+              </div>
+              <div class="field">
+                <label for="note">หมายเหตุ</label>
+                <textarea id="note" placeholder="รายละเอียดให้ผู้เซ็นอ่าน"></textarea>
+              </div>
+              <div id="createReview" class="review-box hidden"></div>
+              <div class="actions">
+                <button id="createReviewBtn" class="btn blue" type="button">ตรวจสอบไฟล์ก่อนส่ง</button>
+                <button id="createSubmitBtn" class="btn primary hidden" type="submit">ส่งจริงและแจ้งเตือน</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <h2>ภาพรวมสำหรับ Admin/BME</h2>
+            <div class="guide-grid compact-guide">
+              <div>
+                <h3>1. สร้างเอกสาร</h3>
+                <p>Admin/BME แนบไฟล์ Excel, ใบปะหน้า, ใบเสนอราคา และรูปหรือไฟล์ประกอบ แล้วกดส่ง</p>
+              </div>
+              <div>
+                <h3>2. เซ็นตามคิว</h3>
+                <p>Supervisor และหัวหน้าหน่วยเครื่องมือแพทย์เข้าหน้า งานที่ต้องเซ็น เพื่ออ่านไฟล์และลงนาม</p>
+              </div>
+              <div>
+                <h3>3. หัวหน้าแผนกเซ็นจริง</h3>
+                <p>Admin/BME นำเอกสารไปให้หัวหน้าแผนกเซ็นบนกระดาษ แล้วกลับมาบันทึกผลในระบบ</p>
+              </div>
+              <div>
+                <h3>4. Completed</h3>
+                <p>เมื่อหัวหน้าหน่วยเครื่องมือแพทย์ประทับสุดท้าย ระบบจะสร้างโฟลเดอร์ Completed บนคอมกลางอัตโนมัติ</p>
+              </div>
+            </div>
+            <div id="unitInsights" class="unit-insights"></div>
+            <div id="adminDocs" class="doc-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="inboxView" class="view hidden">
+        <div class="layout">
+          <div class="panel">
+            <h2>งานที่ต้องเซ็น</h2>
+            <p class="muted">หน้านี้แสดงเฉพาะเอกสารที่ถึงคิวของคุณเท่านั้น</p>
+            <div id="inboxDocs" class="doc-list gap-top"></div>
+          </div>
+          <div class="panel">
+            <h2>อ่าน PDF และเซ็น</h2>
+            <div id="signBox" class="empty">เลือกเอกสารที่รอเซ็น</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="trackView" class="view hidden">
+        <div class="panel">
+          <h2>ติดตามสถานะ</h2>
+          <div id="storageBox" class="storage-box"></div>
+          <div class="search-row">
+            <input id="docSearch" type="search" placeholder="Search document, department, RR, status...">
+          </div>
+          <div id="trackFilters" class="filter-bar"></div>
+          <div id="trackDocs" class="doc-list"></div>
+        </div>
+      </section>
+
+      <section id="auditView" class="view hidden">
+        <div class="panel">
+          <div id="auditBox" class="audit-box"></div>
+        </div>
+      </section>
+
+      <section id="settingsView" class="view hidden">
+        <div class="layout">
+          <div class="panel">
+            <h2>ช่องทางแจ้งเตือน</h2>
+            <form id="settingsForm">
+              <div class="field">
+                <label for="publicBaseUrl">Permanent system link / domain</label>
+                <input id="publicBaseUrl" placeholder="https://paolo-samutprakan-bme.example.com">
+              </div>
+              <div class="two">
+                <div class="field">
+                  <label for="lowDiskWarnGb">Low disk warning (GB)</label>
+                  <input id="lowDiskWarnGb" type="number" min="1" value="5">
+                </div>
+                <div class="field">
+                  <label for="dashboardDocLimit">Dashboard document limit</label>
+                  <input id="dashboardDocLimit" type="number" min="5" max="100" value="30">
+                </div>
+              </div>
+              <div class="two">
+                <div class="field">
+                  <label for="auditRetentionDays">Audit log retention (days)</label>
+                  <input id="auditRetentionDays" type="number" min="7" max="365" value="90">
+                </div>
+                <div class="field">
+                  <label for="generatedRetentionDays">PDF cache cleanup (days)</label>
+                  <input id="generatedRetentionDays" type="number" min="1" max="90" value="14">
+                </div>
+              </div>
+              <div class="two">
+                <div class="field">
+                  <label for="smtpHost">SMTP Host</label>
+                  <input id="smtpHost" placeholder="เช่น smtp.gmail.com">
+                </div>
+                <div class="field">
+                  <label for="smtpPort">SMTP SSL Port</label>
+                  <input id="smtpPort" type="number" value="465">
+                </div>
+              </div>
+              <div class="field">
+                <label for="smtpUser">SMTP Username / Email</label>
+                <input id="smtpUser" placeholder="เช่น bme@example.com">
+              </div>
+              <div class="field">
+                <label for="smtpPass">SMTP Password / App Password</label>
+                <input id="smtpPass" type="password" placeholder="ใส่ใหม่เฉพาะตอนเปลี่ยนรหัส">
+              </div>
+              <div class="field">
+                <label for="smtpFrom">ชื่ออีเมลผู้ส่ง</label>
+                <input id="smtpFrom" placeholder="เช่น bme@example.com">
+              </div>
+              <button class="btn primary" type="submit">บันทึก Settings และผู้ใช้งาน</button>
+              <button class="btn blue" id="testSmtpBtn" type="button">ทดสอบ SMTP</button>
+              <div id="smtpResult" class="smtp-result"></div>
+            </form>
+          </div>
+          <div class="panel">
+            <h2>จัดการผู้ใช้และรหัส Login/PIN</h2>
+            <p class="muted">Admin เปลี่ยนรหัสของ Admin, Supervisor และหัวหน้าหน่วยเครื่องมือแพทย์ได้ตรงนี้ ใส่รหัสใหม่เฉพาะคนที่ต้องการเปลี่ยน</p>
+            <div class="actions gap-top">
+              <button class="btn primary" id="saveUsersBtn" type="button">บันทึกรหัส/ผู้ใช้ทั้งหมด</button>
+            </div>
+            <div id="userSettings" class="user-settings"></div>
+          </div>
+          <div class="panel">
+            <h2>Backup / Restore</h2>
+            <p class="muted">สำรองฐานข้อมูลระบบนี้เท่านั้น ไม่สำรองไฟล์อื่นในคอม</p>
+            <div class="actions">
+              <button class="btn primary" id="backupCreateBtn" type="button">Create backup now</button>
+              <button class="btn" id="backupRefreshBtn" type="button">Refresh list</button>
+            </div>
+            <div id="backupList" class="backup-list gap-top"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="busyOverlay" class="busy-overlay hidden">
+    <div class="busy-card">
+      <div class="spinner"></div>
+      <strong id="busyTitle">กำลังดำเนินการ</strong>
+      <span id="busyText">กรุณารอสักครู่</span>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
