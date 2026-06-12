@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "settings": {
+    "publicBaseUrl": "",
+    "smtp": {},
+    "system": {}
+  },
+  "users": [
+    {
+      "id": "bme-admin",
+      "name": "Admin BME",
+      "role": "admin",
+      "department": "BME",
+      "email": "chaiyasit120354@gmail.com",
+      "passwordHash": "ab899c8a1f2fc78b80277a8f1e0ba0b3f694b2d5b8e334b6a77f25e8f82b1eba",
+      "defaultPasswordHash": "ab899c8a1f2fc78b80277a8f1e0ba0b3f694b2d5b8e334b6a77f25e8f82b1eba"
+    },
+    {
+      "id": "supervisor-bme",
+      "name": "Supervisor CES (PLS) นายปัญญา ศิริธรรมจักร์",
+      "role": "supervisor",
+      "department": "BME",
+      "email": "",
+      "passwordHash": "d0d1c2e36a372130e42fc82690a7dc9dfa2d591a410b65af91f98bafe7a37dd9",
+      "defaultPasswordHash": "d0d1c2e36a372130e42fc82690a7dc9dfa2d591a410b65af91f98bafe7a37dd9"
+    },
+    {
+      "id": "head-equipment",
+      "name": "หัวหน้าหน่วยเครื่องมือแพทย์ นายพงศ์ชยิน วงศ์โชติวรกุล",
+      "role": "equipment_head",
+      "department": "BME",
+      "email": "",
+      "passwordHash": "d0d1c2e36a372130e42fc82690a7dc9dfa2d591a410b65af91f98bafe7a37dd9",
+      "defaultPasswordHash": "d0d1c2e36a372130e42fc82690a7dc9dfa2d591a410b65af91f98bafe7a37dd9"
+    }
+  ],
+  "sessions": {},
+  "docs": [],
+  "notifications": [],
+  "audit": []
+}

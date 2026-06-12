@@ -1,0 +1,22 @@
+﻿Paolo Samut Prakan-BME
+
+ใช้โฟลเดอร์นี้เป็นตัวจริงตัวเดียว:
+D:\Paolo-SamutPrakan-BME
+
+1) เปิดระบบประจำวัน:
+01_OPEN_SYSTEM.bat
+
+2) ตั้ง Cloudflare Named Tunnel + โดเมนถาวร ครั้งแรก:
+02_SETUP_CLOUDFLARE_DOMAIN.bat
+ใช้เมล Cloudflare: chaiyasit120354@gmail.com
+ต้องมีโดเมนจริงใน Cloudflare ก่อน เช่น bme.yourdomain.com
+
+3) หลังตั้งโดเมนเสร็จแล้ว เปิดลิงก์ถาวร:
+03_START_PERMANENT_DOMAIN.bat
+
+4) สำรอง/อัปเดตโฟลเดอร์นี้:
+04_BACKUP_OR_UPDATE_THIS_FOLDER.bat
+
+ข้อมูลจริงอยู่ใน send-hospital-data
+ตัวโปรแกรมอยู่ใน send-hospital-system
+ห้ามแยกสองโฟลเดอร์นี้ออกจากกัน
